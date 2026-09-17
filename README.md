@@ -302,3 +302,24 @@ imagem chegar; defasados, a página salta no meio do carregamento.
 - `prefers-reduced-motion: reduce` desliga o Lenis, as timelines e a cena
   WebGL, e mostra só o primeiro passo estático.
 - Sem WebGL, o canvas é substituído por um volume em CSS.
+
+## Publicação
+
+Hospedado na Vercel, importado do GitHub: cada push na `main` republica.
+O `vercel.json` traz o build e dois blocos de cache. JSON não aceita
+comentário, então o porquê de cada um fica aqui.
+
+**`/assets/*` — um ano, `immutable`.** São os arquivos que o Vite gera com
+hash no nome: mudou o conteúdo, muda o nome do arquivo. Não existe risco de
+servir versão velha, porque uma versão nova nunca reusa o mesmo endereço.
+
+**`/media/*` e `/brand/*` — um dia no navegador, uma semana na CDN.** Estes
+mantêm o nome quando o conteúdo muda: trocar `equipe.jpg` por outra foto
+guarda o mesmo endereço. Cache longo aqui deixaria a foto antiga em pé por
+semanas. O `stale-while-revalidate` serve a versão em cache na hora e busca
+a nova em segundo plano, então a troca aparece na visita seguinte sem
+ninguém esperar download.
+
+O `.vercelignore` vale só para deploy pelo CLI. Importado do GitHub, a
+Vercel clona o repositório inteiro — `midias-originais/` incluso. Isso pesa
+no clone da build, não no que o visitante baixa.
