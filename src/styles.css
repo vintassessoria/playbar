@@ -1,0 +1,1744 @@
+/* =========================================================
+   Playbar — base
+   ========================================================= */
+
+:root {
+  /* Fonte única das cores da marca. As fitas da faixa de serviços leem estes
+     tokens em tempo de execução (ver src/tokens.js), então não existe hex de
+     marca solto no JavaScript para sair do tom. */
+  --pink: #ff2d6b;
+  --pink-soft: rgba(255, 45, 107, 0.35);
+  --black: #07070a;
+  --white: #fdfafb;
+  --white-dim: rgba(253, 250, 251, 0.56);
+
+  /* As 4 fatias do hero são todas quase pretas: o que diferencia cada
+     passo é o brilho e a temperatura, não a matiz. É o que mantém a
+     direção "fundo predominantemente preto" sem perder a leitura do giro. */
+  --step-1: #120810;
+  --step-2: #0b0910;
+  --step-3: #14060c;
+  --step-4: #08090d;
+
+  /* Diâmetro da "roda" do hero.
+     Quanto maior o raio, menor o ângulo em que os cantos da tela caem —
+     e é isso que permite usar fatias justas sem o passo vizinho vazar.
+     360vmax mantém os cantos abaixo de ~32° em qualquer proporção de tela. */
+  --wheel: 360vmax;
+
+  /* Fonte de cartaz, no espírito dos posts da Playbar. Só existe no peso 400:
+     declarar 600 ou 700 aqui faria o navegador engordar as letras por conta
+     própria e sujar o desenho. Todas as regras que usam --font-display pedem
+     400 de propósito. */
+  --font-display: "Lilita One", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Archivo", ui-sans-serif, system-ui, sans-serif;
+  --font-hand: "Caveat", cursive;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* O `display: none` que o navegador dá a `[hidden]` vem da folha dele, com
+   especificidade zero — qualquer `.classe { display: ... }` nossa ganha dele
+   e o elemento escondido reaparece. Foi o que aconteceu com os botões do
+   formulário de orçamento, todos `.btn { display: inline-flex }`. */
+[hidden] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* Granulado do fundo — ver .opening::before. Fica numa camada só do degradê,
+   abaixo de qualquer foto, para não sujar as imagens. */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* =========================================================
+   Header
+   ========================================================= */
+
+.site-header {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px clamp(20px, 4vw, 56px);
+}
+
+.site-header .logo img {
+  display: block;
+  height: 22px;
+  width: auto;
+  transition: filter 0.25s ease;
+}
+
+/* ── Header sobre a abertura rosa ────────────────────────
+   O logo branco e o botão vazado seguem funcionando sobre o rosa. O que não
+   funciona é o "Reservar", que é rosa sobre rosa — ele inverte. */
+
+.site-header.is-on-pink .btn-solid {
+  background: var(--white);
+  color: var(--pink);
+}
+
+.site-header.is-on-pink .btn-solid:hover {
+  background: var(--black);
+  color: var(--white);
+}
+
+.site-actions {
+  display: flex;
+  gap: 10px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 26px;
+  border-radius: 999px;
+  border: 1.5px solid transparent;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 15px;
+  line-height: 1;
+  white-space: nowrap;
+  transition:
+    background-color 0.22s ease,
+    color 0.22s ease,
+    border-color 0.22s ease;
+}
+
+.btn svg {
+  width: 18px;
+  height: 12px;
+  overflow: visible;
+}
+
+.btn-solid {
+  background: var(--pink);
+  color: var(--white);
+}
+
+.btn-solid:hover {
+  background: var(--white);
+  color: var(--black);
+}
+
+.btn-ghost {
+  border-color: rgba(253, 250, 251, 0.35);
+  color: var(--white);
+}
+
+.btn-ghost:hover {
+  border-color: var(--white);
+  background: var(--white);
+  color: var(--black);
+}
+
+@media (max-width: 560px) {
+  /* 15px em cima e embaixo levam o botão a ~45px de altura. Abaixo de 44 o
+     dedo começa a errar o alvo — é a medida mínima recomendada para toque,
+     e no celular todo botão daqui é tocado, não clicado. */
+  .btn {
+    padding: 15px 18px;
+    font-size: 14px;
+  }
+
+  /* A imagem do logo tem 22px; o alvo clicável ia junto. O padding leva a
+     área de toque a 44px sem mexer no desenho. */
+  .site-header .logo {
+    display: flex;
+    align-items: center;
+    padding-block: 11px;
+  }
+
+  /* O "Menu" fica só no ícone. O espaço do cabeçalho no celular dá para um
+     rótulo ou para o botão de orçamento, e entre decorar a navegação e
+     manter a ação que fecha negócio, fica a ação. O texto continua no DOM
+     para o leitor de tela. */
+  .site-actions .btn-rotulo {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .site-actions .btn-ghost {
+    padding: 11px 14px;
+  }
+}
+
+/* =========================================================
+   ABERTURA — campo chapado, tipo gigante, copos na borda
+   ========================================================= */
+
+/* Campo rosa chapado com tipografia branca. É a única seção colorida do site
+   — daí o botão "Reservar", que é rosa, precisar virar branco por cima dela
+   (ver .site-header.is-on-pink). */
+.opening {
+  position: relative;
+  min-height: 100svh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  background: var(--pink);
+  color: var(--white);
+}
+
+/* Granulado, só no fundo.
+
+   A pilha da abertura é: granulado (1) → texto (2) → copos (3). O ruído fica
+   abaixo de tudo que é foto, então dá textura ao branco sem sujar a imagem
+   dos copos. Vem de um feTurbulence embutido — sem requisição e sem arquivo.
+
+   A opacidade é mais baixa que a de um fundo escuro: sobre branco o mesmo
+   ruído lê muito mais forte e vira sujeira. */
+.opening::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0.08;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 180px 180px;
+}
+
+/* Sem z-index aqui de propósito. Com um valor, este bloco viraria contexto
+   de empilhamento e prenderia o sticker atrás dos copos — o z-index fica nas
+   linhas do título, que são justamente o que deve passar por baixo. */
+.opening-inner {
+  position: relative;
+  padding: clamp(112px, 16svh, 190px) clamp(20px, 5vw, 64px) 0;
+}
+
+.opening-title {
+  margin: 0 auto;
+  max-width: 14ch;
+  position: relative;
+  color: var(--white);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.7rem, 9.4vw, 8.6rem);
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+/* Cada linha é uma janela: o <span> de dentro sobe de baixo no load. */
+.opening-title .line {
+  display: block;
+  position: relative;
+  z-index: 2; /* abaixo dos copos */
+  overflow: hidden;
+  padding-bottom: 0.06em; /* evita cortar descendentes no recorte */
+}
+
+.opening-title .line > span {
+  display: block;
+}
+
+/* Ambos em em, contra a caixa do <h1>: escalam junto com o título e não
+   descolam dele quando a largura da tela muda. */
+.opening-doodle {
+  position: absolute;
+  z-index: 4; /* marca de frente: passa por cima dos copos */
+  top: -0.22em;
+  left: -0.04em;
+  width: 0.44em;
+  color: var(--white);
+  transform: rotate(-12deg);
+}
+
+.opening-sticker {
+  position: absolute;
+  z-index: 4; /* sticker é camada de frente: fica acima dos copos */
+  right: -0.15em;
+  bottom: -0.25em;
+  padding: 10px 20px 8px;
+  border-radius: 999px;
+  /* Invertido em relação ao resto do site: rosa sobre rosa sumiria. */
+  background: var(--white);
+  color: var(--pink);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(0.8rem, 1.4vw, 1.15rem);
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  transform: rotate(-16deg);
+  /* Sombra projetada, não brilho: um glow rosa só aparece contra fundo
+     escuro. Sobre branco ele vira uma mancha em volta do sticker. */
+  box-shadow: 0 8px 22px rgba(255, 45, 107, 0.3);
+}
+
+/* Acima do título: os copos entram na frente da escrita e comem a base da
+   última linha, que é o que dá a sensação de camadas de cartaz.
+ */
+.opening-lineup {
+  position: relative;
+  z-index: 3;
+  display: block;
+  /* Mais largo que a tela de propósito: a fileira sangra dos dois lados, o
+     que faz ela parecer continuar além do quadro em vez de terminar nele.
+     A proporção é 3:1, então largura demais joga a altura para baixo — daí o
+     teto em px além do de viewport. */
+  /* Quem esconde a base das garrafas é o `overflow: hidden` da abertura no
+     limite de 100svh — não a margem. Então o controle do corte é o TAMANHO:
+     quanto mais larga a imagem, mais alta ela fica (a proporção é 3:1) e mais
+     ela cai abaixo da dobra. Aumentar aqui tampa mais. */
+  width: min(140vw, 1950px);
+  height: auto;
+
+  /* Em cima, puxa para encostar no título. Embaixo, a margem negativa existe
+     só para a seção não crescer atrás da imagem: sem ela a abertura cresceria
+     para caber tudo e nada seria cortado. */
+  margin: clamp(-60px, -4svh, -10px) 0 -22%;
+  /* `align-self`, e não `margin: auto`: margem automática não consegue
+     centrar um item de flex mais largo que o contêiner — ele ancora na borda
+     esquerda e sangra só para a direita. */
+  align-self: center;
+  filter: drop-shadow(0 26px 46px rgba(7, 7, 10, 0.32));
+}
+
+
+@media (max-width: 720px) {
+  .opening-sticker {
+    right: -0.05em;
+    bottom: -0.55em;
+  }
+
+  /* O título no celular bate no teto da largura, não no da altura. A linha
+     mais longa — "Aperte o play" — mede 6,34em, e o respiro lateral come
+     40px fixos: em 12,5vw sobram ~13% de folga em qualquer tela, inclusive
+     nos 320px de um iPhone SE. Subir para 13,5vw deixaria 6px ali, e como
+     `.line` tem `overflow: hidden`, o estouro seria cortado calado em vez
+     de aparecer como erro. O `14ch` do desktop passaria disso; as quebras
+     são fixas no HTML, então soltar o limite não reflui nada. */
+  /* O respiro só garante que o título não corra por baixo do cabeçalho; o
+     resto da sobra vem do `margin-top: auto`, que também está nas garrafas.
+     Duas margens automáticas na mesma coluna rachan a folga pela metade, e
+     é isso que tira o vão do meio: em vez de um buraco entre o título e a
+     imagem, sobra a mesma respirada em cima e embaixo do título. */
+  .opening-inner {
+    padding-top: 86px;
+    margin-top: auto;
+  }
+
+  .opening-title {
+    font-size: 12.5vw;
+    max-width: none;
+  }
+
+  /* Corte fechado nos dois copos da Playbar, que estão bem no centro da
+     imagem.
+
+     A composição do desktop não atravessa para cá: lá o título ocupa 44% da
+     altura e encosta nas garrafas, com vão zero. Numa tela estreita o
+     título não passa de ~17%, porque quem manda é a largura. Insistir na
+     mesma moldura deixaria a fileira inteira encolhida numa faixa fina, com
+     meia tela de rosa vazio em cima — que é o que estava acontecendo.
+
+     Então a imagem cresce até preencher a metade de baixo. A 340vw só o
+     miolo aparece, e o miolo é justamente o produto da casa: nove garrafas
+     ilegíveis viram dois copos da Playbar em tamanho de cartaz. */
+  .opening-lineup {
+    width: 340vw;
+    margin-top: auto;
+    margin-bottom: -17%;
+  }
+}
+
+/* =========================================================
+   HERO — pista de scroll + palco sticky
+   ========================================================= */
+
+.hero {
+  position: relative;
+  height: 400vh; /* 4 passos × 100vh de pista */
+}
+
+.hero-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--black);
+}
+
+/* Fundo da seção — a cor é animada pelo GSAP */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background-color: var(--black);
+  z-index: 0;
+}
+
+/* Vinheta suave por cima de tudo */
+.hero-stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: radial-gradient(
+    115% 85% at 50% 45%,
+    transparent 48%,
+    rgba(3, 3, 5, 0.72) 100%
+  );
+}
+
+/* ── A roda ───────────────────────────────────────────────
+   Círculo gigante ancorado no topo do palco. Cada passo é
+   girado em torno do CENTRO do círculo, então girar a roda
+   traz o passo seguinte para a vertical.                    */
+
+.hero-wheel {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: var(--wheel);
+  height: var(--wheel);
+  margin-left: calc(var(--wheel) / -2);
+  border-radius: 50%;
+  overflow: hidden;
+  transform-origin: 50% 50%;
+  will-change: transform;
+  z-index: 1;
+}
+
+/* Cada passo ocupa o quadrado inteiro da roda e é recortado numa fatia
+   de ±48° apontada para cima. Os passos ficam a 90° um do outro, então
+   sobra 6° de sobreposição: o bastante para não abrir fresta na divisa,
+   pouco o suficiente para o passo vizinho ficar fora da tela em repouso. */
+.hero-step {
+  position: absolute;
+  inset: 0;
+  transform-origin: 50% 50%;
+  clip-path: polygon(50% 50%, -98.6% -83.8%, 198.6% -83.8%);
+}
+
+.hero-step:nth-child(1) { transform: rotate(0deg);   background-color: var(--step-1); }
+.hero-step:nth-child(2) { transform: rotate(90deg);  background-color: var(--step-2); }
+.hero-step:nth-child(3) { transform: rotate(180deg); background-color: var(--step-3); }
+.hero-step:nth-child(4) { transform: rotate(270deg); background-color: var(--step-4); }
+
+/* Halo atrás da peça 3D — é o que dá o ar de palco iluminado. */
+.hero-step::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 160vw;
+  height: 130svh;
+  transform: translateX(-50%);
+}
+
+.hero-step:nth-child(1)::before {
+  background: radial-gradient(52% 44% at 50% 56%, rgba(255, 45, 107, 0.32), transparent 70%);
+}
+
+.hero-step:nth-child(2)::before {
+  background: radial-gradient(56% 46% at 50% 54%, rgba(56, 198, 201, 0.22), transparent 70%);
+}
+
+.hero-step:nth-child(3)::before {
+  background: radial-gradient(60% 50% at 50% 58%, rgba(255, 45, 107, 0.4), transparent 68%);
+}
+
+.hero-step:nth-child(4)::before {
+  background: radial-gradient(50% 42% at 50% 54%, rgba(223, 230, 255, 0.2), transparent 70%);
+}
+
+/* Hairline neon na borda de ataque de cada fatia. Em repouso ela fica a
+   42° do centro, fora da tela; durante o giro é ela que varre o palco e
+   torna a virada legível mesmo com todas as fatias quase pretas. */
+.hero-step::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 50%;
+  width: 2px;
+  height: 50%;
+  margin-left: -1px;
+  transform-origin: 50% 100%;
+  transform: rotate(-48deg);
+  background: linear-gradient(
+    to top,
+    transparent 0%,
+    var(--pink) 22%,
+    var(--white) 50%,
+    var(--pink) 78%,
+    transparent 100%
+  );
+  box-shadow: 0 0 26px 3px var(--pink-soft);
+}
+
+.hero-step-inner {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  text-align: center;
+  /* A peça 3D ocupa o centro do palco, então o texto vive no terço
+     superior — abaixo da borda curva da roda, acima do objeto. */
+  padding: clamp(104px, 17vh, 200px) 24px 0;
+}
+
+.hero-kicker {
+  margin: 0 0 14px;
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--pink);
+}
+
+.hero-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.5rem, 7vw, 5.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  text-shadow: 0 0 60px rgba(7, 7, 10, 0.9);
+}
+
+.hero-piece {
+  margin: 18px 0 0;
+  font-family: var(--font-hand);
+  font-size: clamp(1.25rem, 2.4vw, 1.75rem);
+  color: var(--white-dim);
+}
+
+/* ── Canvas WebGL ─────────────────────────────────────── */
+
+.hero-canvas,
+.hero-fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.hero-canvas canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.hero-fallback[hidden] {
+  display: none;
+}
+
+/* Sem WebGL: um volume abstrato no lugar da peça. */
+.hero-fallback::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: min(42vmin, 340px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 42% 34%,
+    rgba(253, 250, 251, 0.5) 0%,
+    rgba(255, 45, 107, 0.45) 45%,
+    transparent 72%
+  );
+}
+
+/* ── Loader ───────────────────────────────────────────── */
+
+.hero-loader {
+  position: absolute;
+  z-index: 4;
+  left: 50%;
+  bottom: 88px;
+  transform: translateX(-50%);
+  transition: opacity 0.5s ease;
+}
+
+.hero-loader.is-done {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hero-loader-bar {
+  display: block;
+  width: 120px;
+  height: 2px;
+  background: rgba(253, 250, 251, 0.16);
+  overflow: hidden;
+}
+
+.hero-loader-bar i {
+  display: block;
+  width: 0%;
+  height: 100%;
+  background: var(--pink);
+  box-shadow: 0 0 12px var(--pink);
+  transition: width 0.3s ease;
+}
+
+/* ── UI fixa do hero ──────────────────────────────────── */
+
+.hero-ui {
+  position: absolute;
+  z-index: 4;
+  inset: auto clamp(20px, 4vw, 56px) 32px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--white-dim);
+}
+
+.hero-counter b {
+  font-weight: 600;
+  color: var(--pink);
+}
+
+.hero-counter i {
+  font-style: normal;
+  margin: 0 4px;
+  opacity: 0.4;
+}
+
+.hero-hint {
+  animation: hint-pulse 2.6s ease-in-out infinite;
+}
+
+@keyframes hint-pulse {
+  0%, 100% { opacity: 0.4; }
+  50%      { opacity: 1; }
+}
+
+/* =========================================================
+   Faixa horizontal
+   ========================================================= */
+
+/* Altura só de partida: o JS a recalcula a partir da largura real da faixa,
+   para 1px de scroll vertical valer 1px de deslocamento horizontal. */
+.strip {
+  position: relative;
+  height: 320vh;
+  background: var(--black);
+}
+
+.strip-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+}
+
+/* Fitas rosas atravessando o fundo da faixa — as "minhocas".
+   O fundo segue preto; elas só passam por cima dele.
+
+   A inclinação fica no container e o deslocamento no track, para os dois
+   transforms não brigarem. `inset` negativo cobre os cantos que a rotação
+   deixaria de fora. */
+.strip-ribbons {
+  position: absolute;
+  inset: -12% -10%;
+  z-index: 0;
+  overflow: hidden;
+  transform: rotate(-7deg);
+  pointer-events: none;
+}
+
+/* Dobro da largura: o desenho tem duas repetições da onda, e deslocar
+   metade devolve o mesmo quadro — o loop fecha sem emenda. */
+.ribbons-track {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 200%;
+  height: 100%;
+  will-change: transform;
+}
+
+.ribbons-track svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.strip-track {
+  position: relative;
+  z-index: 1; /* acima das fitas */
+  display: flex;
+  gap: clamp(20px, 3vw, 48px);
+  padding: 0 clamp(20px, 6vw, 96px);
+  will-change: transform;
+}
+
+.strip-card {
+  position: relative;
+  flex: 0 0 auto;
+  width: clamp(260px, 32vw, 420px);
+  aspect-ratio: 4 / 5;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: clamp(24px, 3vw, 40px);
+  /* Fundo opaco: sem ele as fitas rosas atravessam o card enquanto a foto
+     ainda não chegou, e o card deixa de ler como uma peça sólida. */
+  background-color: #0d0d12;
+  border: 1px solid rgba(253, 250, 251, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Slot de mídia: um <img> ou <video> como primeiro filho do card preenche a
+   moldura inteira, com o gradiente de leitura e o texto por cima.
+
+   A foto fica em -2 e o gradiente em -1 de propósito. Com os dois no mesmo
+   nível, o ::before é pintado antes dos filhos do elemento e a imagem cobriria
+   justamente o gradiente que existe para o texto continuar legível. */
+.strip-media {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Quase opaca: quem escurece para o texto ler é o gradiente do ::before,
+     concentrado embaixo. Baixar a opacidade daqui apagaria a foto inteira,
+     inclusive o topo, onde não há texto nenhum para proteger. */
+  opacity: 0.95;
+}
+
+.strip-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  /* Mais fechado embaixo e some mais cedo: com a foto quase opaca, o texto
+     precisa de mais cobertura na faixa onde ele mora, e o topo pode ficar
+     limpo. */
+  background: linear-gradient(
+    to top,
+    rgba(7, 7, 10, 0.96) 14%,
+    rgba(7, 7, 10, 0.55) 38%,
+    rgba(7, 7, 10, 0.12) 62%,
+    transparent 82%
+  );
+}
+
+.strip-card h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.8rem, 3.4vw, 2.75rem);
+  /* Sem isto herdava o 1.5 do corpo do texto, e os títulos de duas linhas
+     ficavam com um vão enorme entre elas. */
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+}
+
+.strip-card p {
+  margin: 0;
+  max-width: 34ch;
+  color: var(--white-dim);
+  font-size: 15px;
+}
+
+/* ── Carrossel de arrastar ────────────────────────────────
+   A versão do desktop prende a seção por 320vh e converte rolagem vertical
+   em horizontal, com os cards ondulando quadro a quadro. No telefone isso é
+   caro e desorientador — e rouba do dedo o gesto que ele já sabe fazer.
+   Aqui o pin sai, a onda sai, e sobra rolagem nativa com encaixe.
+
+   São três entradas, e cada uma cobre um caso que a outra deixaria passar:
+
+   - `max-width: 760px` — o celular em pé.
+   - `pointer: coarse` — o celular deitado e o tablet. Um telefone virado
+     tem 844px de largura e passaria como desktop, recebendo o pin justo no
+     aparelho que menos aguenta.
+   - `prefers-reduced-motion` — aqui não é preferência, é correção: o pin
+     mora no JavaScript e nunca roda para quem pediu menos movimento. Sem
+     esta linha a seção ficava com 320vh de altura e uma pista parada, e a
+     pessoa rolava três telas vendo os mesmos dois cards.
+
+   O main.js casa exatamente com o complemento disto. Mexeu aqui, mexe lá. */
+@media (max-width: 760px), (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .strip {
+    height: auto;
+  }
+
+  .strip-stage {
+    position: relative; /* deixa de ser sticky, mas as fitas ainda ancoram */
+    height: auto;
+    padding: clamp(64px, 10svh, 96px) 0;
+  }
+
+  .strip-track {
+    /* `max-content` é o que o palco animado precisa; para rolar de verdade,
+       a pista tem de caber na tela e transbordar por dentro. */
+    width: auto;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 20px;
+    padding-inline: 20px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    /* Zera um x que o GSAP tenha deixado antes de a tela virar. */
+    transform: none;
+  }
+
+  .strip-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .strip-card {
+    scroll-snap-align: center;
+    transform: none; /* sem a onda, nenhum card fica preso torto */
+  }
+}
+
+/* =========================================================
+   REEL — o vídeo abrindo na tela
+   ========================================================= */
+
+.reel {
+  background: var(--black);
+  padding: clamp(80px, 14svh, 170px) 0;
+
+  /* A fileira de vídeos transborda de propósito, para os quadros das pontas
+     sangrarem pelas bordas. Quem corta esse excedente tem de ser a própria
+     seção.
+
+     Antes isso ficava por conta do `overflow-x: hidden` do body, e não
+     funciona: o body esconde a barra de rolagem, mas o documento continua
+     com a largura do conteúdo — 530px numa tela de 375. O resultado é uma
+     sobra à direita, que aparece como faixa vazia ou como página que
+     desliza de lado.
+
+     `clip` na segunda linha por cima de `hidden`: onde houver suporte ele
+     corta sem transformar a seção em contêiner de rolagem, e onde não
+     houver a primeira linha continua valendo. */
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+.reel-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── A frase, em blend de inversão ───────────────────────
+   `difference` subtrai o texto do que está atrás: sobre as partes escuras
+   do vídeo ele sai branco, sobre as claras ele inverte e escurece. É o que
+   faz a frase parecer recortada dentro da imagem em vez de colada por cima.
+
+   A camada cobre o palco inteiro e centra a frase por flex — assim o blend
+   alcança os três vídeos e os vãos pretos entre eles. */
+.reel-text {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Não intercepta o mouse: ficaria no caminho dos vídeos. */
+  pointer-events: none;
+  mix-blend-mode: difference;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.2rem, 7vw, 6rem);
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--white);
+  text-transform: lowercase;
+}
+
+
+/* O vão é largo de propósito: as colunas se afastam e as das pontas encostam
+   nas bordas da tela — em largura grande a fileira chega a transbordar, e o
+   `overflow-x: hidden` do body corta o excedente. Como o tamanho dos cards é
+   limitado pela altura, e não pela largura, abrir o vão espalha sem encolher. */
+.reel-row {
+  display: flex;
+  align-items: center;
+  gap: clamp(16px, 5vw, 110px);
+  padding: 0 clamp(8px, 1.2vw, 20px);
+}
+
+.reel-frame {
+  position: relative;
+  flex: 1 1 0;
+  /* Teto pelo lado mais curto: a altura não pode estourar a tela e a largura
+     não pode espremer as três colunas. Quem chegar primeiro manda. */
+  max-width: min(32vw, 470px);
+  aspect-ratio: 9 / 16;
+  max-height: 86svh;
+  overflow: hidden;
+  border-radius: 14px;
+  /* A sombra é o que faz a inclinação ler como peça jogada e não como erro
+     de alinhamento: sem ela os cards tortos parecem só desencontrados. */
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.6);
+}
+
+/* Cada um cai para um lado, com alturas diferentes. Os ângulos são
+   propositalmente desiguais — dois espelhados dariam um padrão, e padrão é
+   justamente o que tira a sensação de "jogado". */
+.reel-frame:nth-child(1) {
+  transform: rotate(-5deg) translateY(18px);
+}
+
+.reel-frame:nth-child(2) {
+  z-index: 1; /* o do meio por cima, como o topo da pilha */
+  transform: rotate(3.2deg) translateY(-14px);
+}
+
+.reel-frame:nth-child(3) {
+  transform: rotate(-2.2deg) translateY(24px);
+}
+
+.reel-frame video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Em tela estreita três colunas viram três tiras ilegíveis: os vídeos
+   empilham numa coluna só. */
+@media (max-width: 760px) {
+  /* A fileira continua fileira, como no desktop: os três quadros lado a
+     lado, o do meio inteiro e os das pontas sangrando pelas bordas. É o
+     recorte que dá a leitura de "pilha de peças jogadas" — empilhar em
+     coluna transformava isso em três vídeos soltos, um embaixo do outro. */
+  .reel-row {
+    gap: 8px;
+  }
+
+  .reel-frame {
+    /* `flex: 1 1 0` divide a largura da tela por três e espreme tudo. Aqui
+       cada quadro tem tamanho próprio e a fileira transborda de propósito —
+       quem corta é o `overflow-x: hidden` do body, igual ao desktop. */
+    flex: 0 0 auto;
+    width: 58vw;
+    max-width: none;
+    max-height: none;
+  }
+
+  /* A frase precisa ser mais larga que o quadro do meio para invadir os
+     vizinhos — é isso que faz o blend valer a pena, porque ela atravessa
+     três imagens diferentes em vez de ficar contida numa. No desktop a
+     proporção é ~1,2× a largura do quadro; o piso de 2,2rem do clamp
+     deixava em 0,85 aqui. */
+  .reel-text {
+    font-size: 13.2vw;
+  }
+
+  /* Mesmos ângulos do desktop; só o deslocamento vertical encolhe, na
+     proporção do quadro menor. */
+  .reel-frame:nth-child(1) {
+    transform: rotate(-5deg) translateY(10px);
+  }
+
+  .reel-frame:nth-child(2) {
+    transform: rotate(3.2deg) translateY(-8px);
+  }
+
+  .reel-frame:nth-child(3) {
+    transform: rotate(-2.2deg) translateY(13px);
+  }
+}
+
+/* =========================================================
+   NÚMEROS
+   ========================================================= */
+
+.numeros {
+  background: var(--black);
+  padding: clamp(80px, 14svh, 160px) clamp(20px, 6vw, 96px);
+}
+
+.numeros-titulo {
+  margin: 0 0 clamp(40px, 6svh, 72px);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  letter-spacing: -0.02em;
+  text-align: center;
+  color: var(--white-dim);
+}
+
+/* `auto-fit` com mínimo: vira 4 colunas em tela larga, 2 no meio do caminho e
+   1 no celular, sem precisar de media query para cada degrau. */
+.numeros-lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: clamp(32px, 5vw, 64px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-width: 1200px;
+  margin-inline: auto;
+}
+
+/* Dois a dois em vez de quatro empilhados. São quatro números curtos: numa
+   coluna só, a seção virava meia tela de rolagem para ler quatro palavras. */
+@media (max-width: 620px) {
+  .numeros-lista {
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(28px, 7vw, 40px) 16px;
+  }
+}
+
+.numero {
+  text-align: center;
+}
+
+.numero b {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(3rem, 6vw, 5rem);
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--pink);
+  /* Dígitos de mesma largura: sem isso o número treme enquanto a contagem
+     sobe, porque cada algarismo tem largura própria. */
+  font-variant-numeric: tabular-nums;
+}
+
+.numero-sufixo {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
+  color: var(--pink);
+  margin-left: 0.12em;
+}
+
+.numero p {
+  margin: 12px 0 0;
+  font-size: 15px;
+  color: var(--white-dim);
+}
+
+/* =========================================================
+   Cabeçalhos de seção — compartilhados
+   ========================================================= */
+
+/* Cada palavra é uma janela; o <span> de dentro sobe ao entrar em cena.
+   `padding-bottom` evita que o recorte coma os descendentes. */
+.palavra {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.08em;
+}
+
+.palavra > span {
+  display: inline-block;
+}
+
+.secao-kicker {
+  margin: 0 0 14px;
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--pink);
+}
+
+.secao-titulo {
+  margin: 0 0 clamp(40px, 6svh, 72px);
+  max-width: 18ch;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2rem, 4.6vw, 3.6rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+
+/* =========================================================
+   Tipos de evento
+   ========================================================= */
+
+/* Só fundo e respiro. O layout de cada uma vem depois, separado: estas três
+   seções compartilham a moldura, não a organização interna. */
+.verticais,
+.processo,
+.sobre {
+  background: var(--black);
+  padding: clamp(80px, 14svh, 160px) clamp(20px, 6vw, 96px);
+}
+
+
+/* O texto e o formulário dividem a mesma seção. A coluna da esquerda é a
+   mais larga porque o título é de cartaz; a da direita só precisa caber o
+   campo mais largo do formulário. Abaixo de 1000px vira uma coluna só. */
+.sobre {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(48px, 6vw, 96px);
+}
+
+@media (max-width: 1000px) {
+  .sobre {
+    grid-template-columns: 1fr;
+  }
+}
+
+.verticais-lista,
+.processo-lista {
+  display: grid;
+  /* `auto-fit` resolve os três degraus de largura sem media query: 4 colunas
+     em tela grande, 2 no meio, 1 no celular. */
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: clamp(28px, 4vw, 48px);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.verticais-lista li,
+.processo-lista li {
+  border-top: 1px solid rgba(253, 250, 251, 0.14);
+  padding-top: 20px;
+}
+
+.verticais-lista h3,
+.processo-lista h3 {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.3rem, 2vw, 1.7rem);
+  letter-spacing: -0.01em;
+}
+
+.verticais-lista p,
+.processo-lista p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--white-dim);
+}
+
+.processo-passo {
+  display: block;
+  margin-bottom: 8px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  letter-spacing: 0.16em;
+  color: var(--pink);
+}
+
+/* =========================================================
+   Marcas — marquise contínua
+   ========================================================= */
+
+.marcas {
+  background: var(--black);
+  padding: clamp(28px, 5svh, 52px) 0;
+  border-block: 1px solid rgba(253, 250, 251, 0.12);
+  overflow: hidden;
+}
+
+.marcas-track {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+}
+
+.marcas-lista {
+  display: flex;
+  align-items: center;
+  gap: clamp(32px, 5vw, 72px);
+  /* O mesmo espaço do gap depois da última: sem ele as duas cópias encostam
+     e a emenda do laço fica visível. */
+  padding: 0 clamp(32px, 5vw, 72px) 0 0;
+  margin: 0;
+  list-style: none;
+}
+
+.marcas-lista li {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2vw, 1.6rem);
+  letter-spacing: 0.01em;
+  color: var(--white-dim);
+}
+
+/* Logos achatadas para branco.
+
+   `brightness(0)` zera a cor e preserva o alpha; `invert(1)` vira o preto em
+   branco. O resultado é uma silhueta, independente de a logo original ser
+   colorida, preta ou já branca — que é o que faz doze marcas diferentes
+   lerem como um conjunto só, e não como uma colagem. */
+.marcas-lista img {
+  display: block;
+  /* Altura por peso óptico, não por altura crua: um brasão quadrado e um
+     letreiro de seis palavras precisam de alturas diferentes para ocuparem a
+     mesma presença na fita. Quem calcula `--optica` por logo é o
+     `trocarLogosDasMarcas()`; sem JS, o 1 de fallback devolve a altura base. */
+  height: calc(clamp(20px, 2.4vw, 34px) * var(--optica, 1));
+  width: auto;
+  filter: brightness(0) invert(1);
+  opacity: 0.62;
+  transition: opacity 0.25s ease;
+}
+
+.marcas-lista img:hover {
+  opacity: 1;
+}
+
+/* No celular o `2.4vw` da base vira 9px e cai no piso de 20px — e o piso,
+   multiplicado pela escala óptica das logos mais largas, devolvia 14px de
+   altura para "Casillero del Diablo". Ilegível. Aqui a base é fixa em 30px,
+   que põe a menor delas em ~22px e a mais alta em 45px. */
+@media (max-width: 760px) {
+  .marcas-lista img {
+    height: calc(30px * var(--optica, 1));
+  }
+
+  .marcas-lista {
+    gap: 30px;
+    padding-right: 30px;
+  }
+}
+
+/* =========================================================
+   Sobre
+   ========================================================= */
+
+.sobre-lead {
+  margin: 0 0 clamp(28px, 4svh, 44px);
+  max-width: 20ch;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2rem, 5vw, 4rem);
+  line-height: 1.02;
+  letter-spacing: -0.025em;
+}
+
+.sobre-texto {
+  display: grid;
+  gap: clamp(16px, 2svh, 24px);
+  max-width: 46ch;
+}
+
+.sobre-texto p {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--white-dim);
+}
+
+.sobre-redes {
+  margin: clamp(28px, 4svh, 44px) 0 0;
+  font-size: 15px;
+  color: var(--white-dim);
+}
+
+.sobre-redes a {
+  color: var(--white);
+  text-decoration: underline;
+  text-decoration-color: var(--pink-soft);
+  text-underline-offset: 4px;
+  transition: text-decoration-color 0.2s ease;
+}
+
+/* Links no meio de uma frase: a altura do alvo é a da linha, ~16px. O
+   `inline-block` com padding engorda a área tocável sem tirar as palavras
+   de dentro do texto — `margin` negativo devolve o espaçamento visual,
+   senão a frase abriria buracos entre as palavras. */
+@media (max-width: 760px) {
+  .sobre-redes a {
+    display: inline-block;
+    padding-block: 12px;
+    margin-block: -12px;
+  }
+}
+
+.sobre-redes a:hover {
+  text-decoration-color: var(--pink);
+}
+
+/* =========================================================
+   Orçamento — questionário em três passos
+   ========================================================= */
+
+/* Painel, e não mais seção: um plano acima do preto para o formulário se
+   separar do texto ao lado sem precisar de outra faixa na página. */
+.orcamento {
+  padding: clamp(28px, 4vw, 44px);
+  border: 1px solid rgba(253, 250, 251, 0.12);
+  border-radius: 20px;
+  background: rgba(253, 250, 251, 0.03);
+}
+
+/* Numa tela de 375px o respiro da seção mais o do painel comiam 100px dos
+   dois lados e sobravam 272 para os campos. Empilhado não existe texto ao
+   lado de quem se separar, então o painel abre até a borda da seção e fica
+   só a linha de cima marcando onde ele começa. */
+@media (max-width: 1000px) {
+  .orcamento {
+    padding: clamp(28px, 7vw, 40px) 0 0;
+    border: 0;
+    border-top: 1px solid rgba(253, 250, 251, 0.12);
+    border-radius: 0;
+    background: none;
+  }
+}
+
+/* Menor que o `.sobre-lead` de propósito: dois títulos de cartaz lado a lado
+   brigariam, e quem manda na seção é o da esquerda. */
+.orcamento-titulo {
+  margin: 0 0 12px;
+  max-width: 22ch;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.5rem, 2.4vw, 2.1rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.orcamento-lead {
+  margin: 0 0 clamp(28px, 4svh, 40px);
+  max-width: 42ch;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--white-dim);
+}
+
+/* O fieldset só existe para agrupar; todo o desenho dele é zerado. */
+.passo {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.passo-legenda {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-bottom: clamp(24px, 3svh, 36px);
+  padding: 0;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.4rem, 2.6vw, 2rem);
+  line-height: 1;
+}
+
+.passo-conta {
+  font-family: var(--font-body);
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  color: var(--pink);
+}
+
+/* A entrada é curta de propósito: a pessoa já apertou um botão para chegar
+   aqui, e qualquer coisa mais longa vira espera. */
+.passo.is-entrando {
+  animation: passo-entra 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes passo-entra {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+
+.campo {
+  display: block;
+  margin-bottom: clamp(20px, 3svh, 30px);
+}
+
+.campo-duplo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0 clamp(16px, 2.5vw, 28px);
+}
+
+.campo-rotulo {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 14px;
+  color: var(--white);
+}
+
+.campo-opcional {
+  margin-left: 6px;
+  font-size: 12px;
+  font-style: normal;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--white-dim);
+}
+
+.campo input,
+.campo textarea {
+  width: 100%;
+  padding: 13px 16px;
+  border: 1.5px solid rgba(253, 250, 251, 0.18);
+  border-radius: 12px;
+  background: rgba(253, 250, 251, 0.04);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 16px; /* abaixo de 16px o Safari do iPhone dá zoom no foco */
+  line-height: 1.4;
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease;
+}
+
+.campo textarea {
+  resize: vertical;
+}
+
+.campo input::placeholder,
+.campo textarea::placeholder {
+  color: rgba(253, 250, 251, 0.3);
+}
+
+.campo input:focus,
+.campo textarea:focus {
+  outline: none;
+  border-color: var(--pink);
+  background: rgba(255, 45, 107, 0.07);
+}
+
+/* O seletor nativo de data desenha o ícone em preto, que some no fundo. */
+.campo input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 0.5;
+  cursor: pointer;
+}
+
+/* ── Fichas (as opções de escolha única) ── */
+
+.fichas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.ficha {
+  position: relative;
+  cursor: pointer;
+}
+
+/* O radio continua no documento — só sai de vista. Escondê-lo com
+   `display: none` o tiraria da navegação por teclado junto. */
+.ficha input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+}
+
+.ficha span {
+  display: block;
+  padding: 11px 20px;
+  border: 1.5px solid rgba(253, 250, 251, 0.18);
+  border-radius: 999px;
+  font-size: 15px;
+  color: var(--white-dim);
+  transition:
+    border-color 0.2s ease,
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.ficha:hover span {
+  border-color: rgba(253, 250, 251, 0.45);
+  color: var(--white);
+}
+
+.ficha input:checked + span {
+  border-color: var(--pink);
+  background: var(--pink);
+  color: var(--white);
+}
+
+/* O foco mora no input escondido, então o anel precisa ser desenhado no
+   rótulo — senão navegar por teclado fica às cegas. */
+.ficha input:focus-visible + span {
+  outline: 2px solid var(--white);
+  outline-offset: 2px;
+}
+
+.orcamento-acoes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: clamp(28px, 4svh, 44px);
+}
+
+
+.orcamento-aviso {
+  margin: 16px 0 0;
+  font-size: 13px;
+  color: var(--white-dim);
+}
+
+/* =========================================================
+   Footer
+   ========================================================= */
+
+/* Flex e não grid: o `<nav>` precisa continuar sendo uma caixa só (é um
+   marco de navegação), e é ele que tem de esticar para os três blocos se
+   espalharem. Num grid a coluna dele encolhia para o max-content e as
+   listas empilhavam uma embaixo da outra. */
+.site-footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: start;
+  gap: clamp(36px, 5vw, 64px);
+  padding: clamp(44px, 6svh, 68px) clamp(20px, 6vw, 96px) 24px;
+  border-top: 1px solid rgba(253, 250, 251, 0.1);
+  color: var(--white-dim);
+}
+
+.rodape-marca {
+  flex: 0 1 190px;
+}
+
+.rodape-marca img {
+  display: block;
+  width: 108px;
+  height: auto;
+}
+
+.site-footer .tag {
+  margin: 12px 0 0;
+  font-family: var(--font-hand);
+  font-size: 24px;
+  color: var(--pink);
+}
+
+.rodape-blocos {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  /* Cresce para ocupar o que sobrar da marca — é o que joga o último bloco
+     na borda direita em vez de deixar tudo amontoado. */
+  flex: 1 1 440px;
+  gap: 32px clamp(24px, 4vw, 56px);
+}
+
+.rodape-bloco {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  gap: 10px;
+  min-width: 128px;
+}
+
+.rodape-bloco h2 {
+  margin: 0 0 2px;
+  font-family: var(--font-body);
+  /* 12px é o piso: abaixo disso o Android e o iOS começam a aplicar o
+     aumento automático de fonte e o rótulo sai maior que os links. */
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--pink);
+}
+
+.rodape-bloco a {
+  font-size: 14px;
+  color: var(--white-dim);
+  transition: color 0.2s ease;
+}
+
+.rodape-bloco a:hover {
+  color: var(--white);
+}
+
+.rodape-fim {
+  /* Quebra a linha do flex e fecha o rodapé com um fio de ponta a ponta. */
+  flex: 1 0 100%;
+  margin: clamp(16px, 3svh, 32px) 0 0;
+  padding-top: 20px;
+  border-top: 1px solid rgba(253, 250, 251, 0.1);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Os três blocos lado a lado em vez de um por linha: são listas de dois
+   links cada, e empilhadas viravam meia tela de rodapé. */
+@media (max-width: 620px) {
+  .site-footer {
+    gap: 28px;
+  }
+
+  .rodape-marca {
+    flex-basis: 100%;
+  }
+
+  /* Grade de duas colunas em vez do flex: no flex o último bloco esticava
+     sozinho para a linha inteira, porque não tinha vizinho para dividir a
+     sobra. Na grade ele fica na coluna dele. */
+  .rodape-blocos {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    flex-basis: 100%;
+    gap: 28px 20px;
+  }
+
+  .rodape-bloco {
+    min-width: 0;
+    gap: 0; /* o respiro passa a vir do padding dos próprios links */
+  }
+
+  /* A linha de texto tem 16px; 14 de padding em cada lado fecham os 44px de
+     alvo de toque sem afastar os links visualmente. */
+  .rodape-bloco a {
+    padding-block: 14px;
+  }
+
+  /* O e-mail é a string mais longa do rodapé e não cabe em meia tela. */
+  .rodape-bloco a[href^="mailto"] {
+    overflow-wrap: anywhere;
+  }
+}
+
+/* =========================================================
+   Respiro vertical no celular
+
+   Fica no fim do arquivo de propósito. São overrides de seções declaradas
+   em blocos espalhados acima, e `padding-block` perde para o `padding`
+   completo de qualquer regra que venha depois — juntar tudo aqui, no
+   último lugar, é o que garante que valham.
+   ========================================================= */
+
+/* O `14svh` das seções foi calibrado para tela larga, onde ele vira uma
+   faixa discreta ao lado de conteúdo que ocupa a largura toda. Em pé ele
+   vira buraco: numa tela de 812px são 114px embaixo de uma seção mais 114px
+   em cima da seguinte — 228px de preto entre um assunto e outro, 28% da
+   tela sem nada. A fita de marcas chegava a ter mais preto em volta (109px
+   de cada lado) do que altura própria (103px).
+
+   Com ~7svh o vão fecha em torno de 114px no total: separa os assuntos sem
+   a página parecer partida. As medidas ficam juntas porque o vão entre duas
+   seções é a soma de duas delas — mexer numa só desequilibra o resto. */
+@media (max-width: 760px) {
+  .verticais,
+  .processo,
+  .sobre,
+  .numeros,
+  .reel {
+    padding-block: clamp(44px, 6svh, 68px);
+  }
+
+  /* O palco da faixa já tem os cards com respiro próprio. */
+  .strip-stage {
+    padding-block: clamp(40px, 5.5svh, 60px);
+  }
+
+  /* A marquise tem fios em cima e embaixo, então se separa sozinha. */
+  .marcas {
+    padding-block: clamp(22px, 3svh, 32px);
+  }
+
+  .site-footer {
+    padding-block: clamp(36px, 5svh, 52px) 20px;
+  }
+}
+
+/* =========================================================
+   Acessibilidade — quem pediu menos movimento, recebe menos
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  .opening-doodle,
+  .opening-sticker {
+    transform: none;
+  }
+
+  /* O passo troca na mesma hora; a troca em si é informação, o deslize não. */
+  .passo.is-entrando {
+    animation: none;
+  }
+
+  .hero {
+    height: 100svh;
+  }
+
+  .hero-wheel,
+  .hero-step {
+    transform: none;
+    border-radius: 0;
+    clip-path: none;
+  }
+
+  .hero-step::after {
+    display: none;
+  }
+
+  .hero-step:not(:first-child) {
+    display: none;
+  }
+
+  /* A seção do reel não aparece aqui: ela já é estática por padrão, sem pin
+     nem animação de entrada. */
+
+  .strip {
+    height: auto;
+  }
+
+  .strip-stage {
+    position: static;
+    height: auto;
+    overflow-x: auto;
+    padding: 64px 0;
+  }
+
+  .hero-hint {
+    animation: none;
+  }
+}

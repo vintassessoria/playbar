@@ -1,0 +1,71 @@
+<!--
+  SEÇÃO DESLIGADA — as quatro verticais com as peças 3D.
+
+  Para religar: cole este bloco dentro do <main> de index.html.
+  Nada de JavaScript precisa mudar; src/main.js procura por .hero e só
+  monta a cena (e só baixa o three.js) se encontrar a seção.
+-->
+
+      <!--
+        ── AS QUATRO VERTICAIS ─────────────────────────────────
+        .hero tem 400vh de "pista" de scroll.
+        .hero-stage fica sticky ocupando 100vh.
+        .hero-wheel é um círculo gigante que gira 90° por passo.
+        Cada passo traz uma peça do merch da Playbar no canvas.
+      -->
+      <section class="hero" id="verticais">
+        <div class="hero-stage">
+          <div class="hero-bg" data-hero-bg></div>
+
+          <div class="hero-wheel" data-hero-wheel>
+            <article class="hero-step">
+              <div class="hero-step-inner">
+                <p class="hero-kicker">01 — Eventos sociais</p>
+                <p class="hero-title">Casamentos<br />e celebrações</p>
+                <p class="hero-piece">a taça #aperteoplay</p>
+              </div>
+            </article>
+
+            <article class="hero-step">
+              <div class="hero-step-inner">
+                <p class="hero-kicker">02 — Shows</p>
+                <p class="hero-title">Bar de palco<br />e camarote</p>
+                <p class="hero-piece">o copo do shaka</p>
+              </div>
+            </article>
+
+            <article class="hero-step">
+              <div class="hero-step-inner">
+                <p class="hero-kicker">03 — Festivais</p>
+                <p class="hero-title">Operação<br />em larga escala</p>
+                <p class="hero-piece">a sacola de pista</p>
+              </div>
+            </article>
+
+            <article class="hero-step">
+              <div class="hero-step-inner">
+                <p class="hero-kicker">04 — Corporativo</p>
+                <p class="hero-title">Confraternizações<br />e ativações</p>
+                <p class="hero-piece">o copo assinado</p>
+              </div>
+            </article>
+          </div>
+
+          <!-- Canvas WebGL: as quatro peças vivem aqui -->
+          <div class="hero-canvas" data-hero-canvas aria-hidden="true"></div>
+
+          <!-- Fallback estático (sem WebGL / prefers-reduced-motion) -->
+          <div class="hero-fallback" data-hero-fallback hidden aria-hidden="true"></div>
+
+          <div class="hero-loader" data-hero-loader>
+            <span class="hero-loader-bar"><i data-hero-loader-fill></i></span>
+          </div>
+
+          <div class="hero-ui">
+            <span class="hero-counter">
+              <b data-hero-index>01</b> <i>/</i> 04
+            </span>
+            <span class="hero-hint">role para explorar</span>
+          </div>
+        </div>
+      </section>

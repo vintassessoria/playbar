@@ -1,0 +1,16 @@
+# Dependências e saída de build — a Vercel instala e compila do lado dela.
+node_modules/
+dist/
+
+# Site de terceiros baixado como referência no início do projeto (50 MB).
+# É código de outra empresa: fica só na máquina, não entra no repositório.
+referencia/
+referencia playbar.zip
+
+# Locais
+.DS_Store
+Thumbs.db
+*.log
+.env
+.env.*
+.vercel

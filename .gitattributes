@@ -1,0 +1,11 @@
+# Normaliza a quebra de linha: LF no repositório, o que a máquina usar no
+# disco. Sem isto, um commit feito no Windows e outro no Mac aparecem como
+# arquivo inteiro reescrito.
+* text=auto eol=lf
+
+# Binários não passam por normalização nem por diff de texto.
+*.png binary
+*.jpg binary
+*.webp binary
+*.mp4 binary
+*.zip binary

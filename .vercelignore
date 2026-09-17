@@ -1,0 +1,16 @@
+# A Vercel envia a pasta do projeto e compila do lado dela. Nada aqui entra
+# no build, e mandar tudo isso so faria o upload demorar.
+
+# Midia original da camera, guardada para refazer a compressao (14 MB).
+midias-originais/
+
+# Pecas arquivadas e o material de referencia do projeto.
+docs/
+referencia/
+referencia playbar.zip
+
+# Scripts de manutencao, rodados na mao e nunca no build.
+scripts/
+
+node_modules/
+dist/

@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="pt-BR" class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Playbar — Produção e gestão de bares para eventos</title>
+    <meta
+      name="description"
+      content="Playbar: produção e gestão de bares para eventos sociais, shows, festivais e corporativos."
+    />
+    <meta name="theme-color" content="#07070a" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700&family=Caveat:wght@400;600&family=Lilita+One&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="preload" as="image" href="/brand/lineup.webp" />
+    <link rel="stylesheet" href="/src/styles.css" />
+  </head>
+
+  <body>
+    <!-- ── Header ───────────────────────────────────────────── -->
+    <!-- Começa em is-on-pink porque a abertura rosa é a primeira tela.
+         Um IntersectionObserver tira e devolve a classe ao entrar e sair dela. -->
+    <header class="site-header is-on-pink">
+      <a class="logo" href="#inicio">
+        <img src="/brand/playbar-logo.png" width="489" height="213" alt="Playbar" />
+      </a>
+      <nav class="site-actions">
+        <a class="btn btn-solid" href="#orcamento">Pedir orçamento</a>
+        <a class="btn btn-ghost" href="#servicos">
+          <svg viewBox="0 0 18 12" aria-hidden="true">
+            <path d="M0 1h18M0 6h18M0 11h18" stroke="currentColor" stroke-width="2" />
+          </svg>
+          <!-- Some no celular e sobra só o ícone, para caber o botão de
+               orçamento ao lado. O rótulo continua no acessível. -->
+          <span class="btn-rotulo">Menu</span>
+        </a>
+      </nav>
+    </header>
+
+    <main>
+      <!--
+        ── ABERTURA ────────────────────────────────────────────
+        Campo rosa chapado, tipografia branca gigante e os copos cortados
+        pela borda de baixo. Tudo entra numa timeline só, no load.
+      -->
+      <section class="opening" id="inicio">
+        <div class="opening-inner">
+          <!-- O rabisco e o sticker moram dentro do <h1> de propósito: assim
+               são posicionados em em, contra a caixa do próprio título, e
+               acompanham a tipografia em qualquer largura de tela. -->
+          <h1 class="opening-title">
+            <span class="line"><span data-opening-line>Aperte o play</span></span>
+            <span class="line"><span data-opening-line>e deixe o bar</span></span>
+            <span class="line"><span data-opening-line>com a gente</span></span>
+
+            <svg class="opening-doodle" data-opening-doodle viewBox="0 0 46 38" fill="none" aria-hidden="true">
+              <path d="M5 5c2 14 8 23 15 27" stroke="currentColor" stroke-width="7" stroke-linecap="round" />
+              <path d="M41 3c-2 15-8 25-21 29" stroke="currentColor" stroke-width="7" stroke-linecap="round" />
+            </svg>
+
+            <span class="opening-sticker" data-opening-sticker>@playbar</span>
+          </h1>
+        </div>
+
+        <img
+          class="opening-lineup"
+          data-opening-lineup
+          src="/brand/lineup.webp"
+          alt="Linha de destilados, os copos da Playbar e um chope, lado a lado"
+          width="2170"
+          height="725"
+        />
+      </section>
+
+      <!-- ── TIPOS DE EVENTO ──────────────────────────────────── -->
+      <section class="verticais" id="verticais">
+        <p class="secao-kicker">Onde a gente toca</p>
+        <h2 class="secao-titulo">Cada evento pede um bar diferente</h2>
+
+        <ul class="verticais-lista">
+          <li>
+            <h3>Eventos sociais</h3>
+            <p>Casamentos, formaturas e aniversários. Serviço de taça na mão,
+              ritmo mais calmo e cardápio combinado com os noivos ou anfitriões.</p>
+          </li>
+          <li>
+            <h3>Shows</h3>
+            <p>Bar de palco, camarote e área VIP. Fila curta é a regra: o
+              público some no intervalo e volta todo de uma vez.</p>
+          </li>
+          <li>
+            <h3>Festivais</h3>
+            <p>Vários pontos de venda operando ao mesmo tempo, com reposição e
+              troca de turno sem parar o atendimento.</p>
+          </li>
+          <li>
+            <h3>Corporativo</h3>
+            <p>Confraternizações e ativações de marca. Copo personalizado,
+              consumo controlado e relatório no fim.</p>
+          </li>
+        </ul>
+      </section>
+
+      <!--
+        ── FAIXA HORIZONTAL ────────────────────────────────────
+        Scroll vertical vira movimento horizontal (pinned).
+        Os cards seguem o percurso de um evento: quem faz, o bar montado,
+        o que é servido e o resultado na pista.
+      -->
+      <section class="strip" id="servicos">
+        <div class="strip-stage">
+          <div class="strip-ribbons" data-strip-ribbons></div>
+          <div class="strip-track" data-strip-track>
+            <div class="strip-card">
+              <img
+                class="strip-media"
+                src="/media/equipe.jpg"
+                alt="Equipe da Playbar uniformizada atrás do balcão, em um evento"
+                width="1200"
+                height="900"
+                loading="lazy"
+                decoding="async"
+              />
+              <h2>Equipe</h2>
+              <p>Bartenders, barbacks e supervisão de turno, todos uniformizados.</p>
+            </div>
+            <div class="strip-card">
+              <img
+                class="strip-media"
+                src="/media/bar-montado.jpg"
+                alt="Bartender preparando drinks no balcão montado, com geladeira e copos da casa"
+                width="1200"
+                height="1600"
+                loading="lazy"
+                decoding="async"
+              />
+              <h2>Bar montado</h2>
+              <p>Balcão, refrigeração e mise en place prontos antes do primeiro convidado.</p>
+            </div>
+            <div class="strip-card">
+              <img
+                class="strip-media"
+                src="/media/combos.jpg"
+                alt="Equipe com as plaquinhas de combo numerado e o cardápio do camarote"
+                width="1200"
+                height="1500"
+                loading="lazy"
+                decoding="async"
+              />
+              <h2>Cardápio e combos</h2>
+              <p>Cardápio fechado com o cliente e combos numerados para agilizar o pedido.</p>
+            </div>
+            <div class="strip-card">
+              <img
+                class="strip-media"
+                src="/media/caixa.jpg"
+                alt="Caixa da Playbar com cardápio e maquininha de pagamento em um show"
+                width="1200"
+                height="1500"
+                loading="lazy"
+                decoding="async"
+              />
+              <h2>Caixa</h2>
+              <p>Cartão, Pix e cashless, com maquininha em cada posto de atendimento.</p>
+            </div>
+            <div class="strip-card">
+              <img
+                class="strip-media"
+                src="/media/baldes.jpg"
+                alt="Balde Playbar com destilados, energéticos e gelo"
+                width="1200"
+                height="1600"
+                loading="lazy"
+                decoding="async"
+              />
+              <h2>Baldes</h2>
+              <p>Destilados, energéticos e gelo montados no balde da casa.</p>
+            </div>
+            <div class="strip-card">
+              <img
+                class="strip-media"
+                src="/media/copos-bar.jpg"
+                alt="Fileira de copos amarelos da Playbar no balcão, durante a noite"
+                width="1200"
+                height="948"
+                loading="lazy"
+                decoding="async"
+              />
+              <h2>Copo da casa</h2>
+              <p>Copo próprio, com arte personalizada para cada evento.</p>
+            </div>
+            <div class="strip-card">
+              <img
+                class="strip-media"
+                src="/media/brinde.jpg"
+                alt="Convidados brindando com latas durante a festa"
+                width="1200"
+                height="1600"
+                loading="lazy"
+                decoding="async"
+              />
+              <h2>O brinde</h2>
+              <p>No fim, o que importa: copo cheio e pista animada.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!--
+        ── REEL ────────────────────────────────────────────────
+        Tríptico de vídeos verticais, tortos como se tivessem sido jogados.
+        A frase atravessa o meio deles em blend de inversão.
+      -->
+      <section class="reel" id="reel">
+        <div class="reel-stage">
+          <div class="reel-row">
+            <div class="reel-frame" data-reel-frame>
+              <video
+                data-reel-video
+                src="/media/reel-1.mp4"
+                poster="/media/reel-1-poster.jpg"
+                muted
+                loop
+                playsinline
+                preload="metadata"
+                aria-label="Bar da Playbar em operação durante um evento"
+              ></video>
+            </div>
+            <div class="reel-frame" data-reel-frame>
+              <video
+                data-reel-video
+                src="/media/reel-3.mp4"
+                poster="/media/reel-3-poster.jpg"
+                muted
+                loop
+                playsinline
+                preload="metadata"
+                aria-label="Convidados com drinks durante o evento"
+              ></video>
+            </div>
+            <div class="reel-frame" data-reel-frame>
+              <video
+                data-reel-video
+                src="/media/reel-2.mp4"
+                poster="/media/reel-2-poster.jpg"
+                muted
+                loop
+                playsinline
+                preload="metadata"
+                aria-label="Preparo de drinks no balcão da Playbar"
+              ></video>
+            </div>
+          </div>
+
+          <!-- mix-blend-mode: difference inverte o que passa atrás. -->
+          <p class="reel-text">#aperteoplay</p>
+        </div>
+      </section>
+
+      <!--
+        ── NÚMEROS ─────────────────────────────────────────────
+        ATENÇÃO: os valores de data-numero são PROVISÓRIOS, escolhidos só
+        para a seção ter o que mostrar. Troque pelos números reais da Playbar
+        antes de publicar — o texto dentro do <b> também, que é o que aparece
+        sem JavaScript.
+      -->
+      <section class="numeros" id="numeros">
+        <h2 class="numeros-titulo">A Playbar em números</h2>
+
+        <ul class="numeros-lista">
+          <li class="numero">
+            <b data-numero="450">450</b><span class="numero-sufixo">+</span>
+            <p>eventos realizados</p>
+          </li>
+          <li class="numero">
+            <b data-numero="12">12</b>
+            <p>anos de estrada</p>
+          </li>
+          <li class="numero">
+            <b data-numero="80">80</b>
+            <p>bartenders na equipe</p>
+          </li>
+          <li class="numero">
+            <b data-numero="300">300</b><span class="numero-sufixo">mil</span>
+            <p>drinks servidos</p>
+          </li>
+        </ul>
+      </section>
+
+      <!-- ── COMO FUNCIONA ────────────────────────────────────── -->
+      <section class="processo" id="processo">
+        <p class="secao-kicker">Como funciona</p>
+        <h2 class="secao-titulo">Do briefing ao último copo</h2>
+
+        <ol class="processo-lista">
+          <li>
+            <span class="processo-passo">01</span>
+            <h3>Briefing</h3>
+            <p>Público, duração, horário de pico e perfil de consumo. É o que
+              define o tamanho de tudo que vem depois.</p>
+          </li>
+          <li>
+            <span class="processo-passo">02</span>
+            <h3>Proposta</h3>
+            <p>Cardápio fechado, equipe dimensionada e estrutura definida.
+              Você aprova sabendo o que vai ter no balcão.</p>
+          </li>
+          <li>
+            <span class="processo-passo">03</span>
+            <h3>Montagem</h3>
+            <p>Balcão, refrigeração e mise en place prontos antes do primeiro
+              convidado entrar.</p>
+          </li>
+          <li>
+            <span class="processo-passo">04</span>
+            <h3>Operação e fechamento</h3>
+            <p>Atendimento, reposição e controle de estoque durante o evento.
+              No fim, relatório de consumo.</p>
+          </li>
+        </ol>
+      </section>
+
+      <!--
+        ── MARCAS ──────────────────────────────────────────────
+        Marquise de nomes. A lista aparece duas vezes no HTML de propósito:
+        deslocar metade da largura devolve o mesmo quadro e o laço fecha sem
+        emenda — mesma lógica das fitas da faixa de serviços.
+      -->
+      <section class="marcas" aria-label="Marcas que passam pelo balcão">
+        <div class="marcas-track" data-marcas-track>
+          <ul class="marcas-lista">
+            <li data-marca="absolut">Absolut</li>
+            <li data-marca="jack-daniels">Jack Daniel's</li>
+            <li data-marca="beefeater">Beefeater</li>
+            <li data-marca="tanqueray">Tanqueray</li>
+            <li data-marca="jose-cuervo">Jose Cuervo</li>
+            <li data-marca="sagatiba">Sagatiba</li>
+            <li data-marca="casillero-del-diablo">Casillero del Diablo</li>
+            <li data-marca="red-bull">Red Bull</li>
+            <li data-marca="heineken">Heineken</li>
+            <li data-marca="spaten">Spaten</li>
+            <li data-marca="chivas">Chivas</li>
+            <li data-marca="campari">Campari</li>
+          </ul>
+          <ul class="marcas-lista" aria-hidden="true">
+            <li data-marca="absolut">Absolut</li>
+            <li data-marca="jack-daniels">Jack Daniel's</li>
+            <li data-marca="beefeater">Beefeater</li>
+            <li data-marca="tanqueray">Tanqueray</li>
+            <li data-marca="jose-cuervo">Jose Cuervo</li>
+            <li data-marca="sagatiba">Sagatiba</li>
+            <li data-marca="casillero-del-diablo">Casillero del Diablo</li>
+            <li data-marca="red-bull">Red Bull</li>
+            <li data-marca="heineken">Heineken</li>
+            <li data-marca="spaten">Spaten</li>
+            <li data-marca="chivas">Chivas</li>
+            <li data-marca="campari">Campari</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ── SOBRE + ORÇAMENTO ────────────────────────────────────
+           As duas metades moram na mesma seção de propósito: o texto
+           explica o serviço e o formulário fica ao lado, no alcance da
+           mesma rolagem, em vez de esperar mais uma tela preta abaixo. -->
+      <section class="sobre" id="sobre">
+        <div class="sobre-conteudo">
+          <p class="secao-kicker">Sobre</p>
+          <h2 class="sobre-lead">
+            A gente monta o bar inteiro e opera ele até o último copo.
+          </h2>
+
+          <div class="sobre-texto">
+            <p>Não é só mandar bartender. É balcão, refrigeração, cardápio,
+              equipe uniformizada, meio de pagamento em cada posto e o copo da
+              casa na mão do convidado.</p>
+            <p>Você contrata um bar que já chega pronto para o seu público — e
+              recebe o fechamento no fim, com o consumo todo contabilizado.</p>
+          </div>
+
+          <p class="sobre-redes">
+            Veja o bar montado no
+            <a
+              href="https://www.instagram.com/playbar.eventos/"
+              target="_blank"
+              rel="noopener"
+            >Instagram</a>
+            e no
+            <a
+              href="https://www.tiktok.com/@playbar.eventos"
+              target="_blank"
+              rel="noopener"
+            >TikTok</a>.
+          </p>
+        </div>
+
+        <!-- ── ORÇAMENTO — questionário que fecha no WhatsApp ────── -->
+        <!--
+          O número fica aqui, e não no JavaScript, para poder ser trocado sem
+          tocar em código. Formato internacional, só dígitos: 55 + DDD + número.
+          TROCAR PELO WHATSAPP REAL DA PLAYBAR — o valor abaixo é placeholder.
+        -->
+        <div
+          class="orcamento"
+          id="orcamento"
+          data-whatsapp="5511999999999"
+        >
+          <p class="secao-kicker">Orçamento</p>
+          <h2 class="orcamento-titulo">
+            Conta do evento em nove respostas.
+          </h2>
+          <p class="orcamento-lead">
+            A gente responde com uma proposta fechada — estrutura, equipe e
+            cardápio. Leva menos de um minuto.
+          </p>
+
+        <form class="orcamento-form" novalidate>
+          <!-- ── Passo 1 ── -->
+          <fieldset class="passo" data-passo="1">
+            <legend class="passo-legenda">
+              <span class="passo-conta">01 / 03</span>
+              O evento
+            </legend>
+
+            <div class="campo">
+              <span class="campo-rotulo">Que tipo de evento é?</span>
+              <div class="fichas" role="radiogroup" aria-label="Tipo de evento">
+                <label class="ficha">
+                  <input type="radio" name="tipo" value="Casamento ou festa" required>
+                  <span>Casamento ou festa</span>
+                </label>
+                <label class="ficha">
+                  <input type="radio" name="tipo" value="Show ou festival">
+                  <span>Show ou festival</span>
+                </label>
+                <label class="ficha">
+                  <input type="radio" name="tipo" value="Corporativo">
+                  <span>Corporativo</span>
+                </label>
+                <label class="ficha">
+                  <input type="radio" name="tipo" value="Outro">
+                  <span>Outro</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="campo-duplo">
+              <label class="campo">
+                <span class="campo-rotulo">Quando vai ser?</span>
+                <input type="date" name="data" required>
+              </label>
+
+              <label class="campo">
+                <span class="campo-rotulo">Em que cidade?</span>
+                <input
+                  type="text"
+                  name="cidade"
+                  placeholder="São Paulo, SP"
+                  autocomplete="address-level2"
+                  required
+                >
+              </label>
+            </div>
+          </fieldset>
+
+          <!-- ── Passo 2 ── -->
+          <fieldset class="passo" data-passo="2" hidden>
+            <legend class="passo-legenda">
+              <span class="passo-conta">02 / 03</span>
+              O bar
+            </legend>
+
+            <div class="campo">
+              <span class="campo-rotulo">Quantas pessoas?</span>
+              <div class="fichas" role="radiogroup" aria-label="Número de convidados">
+                <label class="ficha">
+                  <input type="radio" name="publico" value="Até 100" required>
+                  <span>Até 100</span>
+                </label>
+                <label class="ficha">
+                  <input type="radio" name="publico" value="100 a 300">
+                  <span>100 a 300</span>
+                </label>
+                <label class="ficha">
+                  <input type="radio" name="publico" value="300 a 800">
+                  <span>300 a 800</span>
+                </label>
+                <label class="ficha">
+                  <input type="radio" name="publico" value="Mais de 800">
+                  <span>Mais de 800</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="campo">
+              <span class="campo-rotulo">Quem paga a bebida?</span>
+              <div class="fichas" role="radiogroup" aria-label="Modelo do bar">
+                <label class="ficha">
+                  <input type="radio" name="modelo" value="Open bar" required>
+                  <span>Open bar</span>
+                </label>
+                <label class="ficha">
+                  <input type="radio" name="modelo" value="Consumação">
+                  <span>Consumação</span>
+                </label>
+                <label class="ficha">
+                  <input type="radio" name="modelo" value="O convidado paga">
+                  <span>O convidado paga</span>
+                </label>
+                <label class="ficha">
+                  <input type="radio" name="modelo" value="Ainda não sei">
+                  <span>Ainda não sei</span>
+                </label>
+              </div>
+            </div>
+
+            <div class="campo">
+              <span class="campo-rotulo">Quanto tempo de bar aberto?</span>
+              <div class="fichas" role="radiogroup" aria-label="Duração">
+                <label class="ficha">
+                  <input type="radio" name="duracao" value="Até 4h" required>
+                  <span>Até 4h</span>
+                </label>
+                <label class="ficha">
+                  <input type="radio" name="duracao" value="4h a 6h">
+                  <span>4h a 6h</span>
+                </label>
+                <label class="ficha">
+                  <input type="radio" name="duracao" value="6h a 10h">
+                  <span>6h a 10h</span>
+                </label>
+                <label class="ficha">
+                  <input type="radio" name="duracao" value="Mais de 10h">
+                  <span>Mais de 10h</span>
+                </label>
+              </div>
+            </div>
+          </fieldset>
+
+          <!-- ── Passo 3 ── -->
+          <fieldset class="passo" data-passo="3" hidden>
+            <legend class="passo-legenda">
+              <span class="passo-conta">03 / 03</span>
+              Você
+            </legend>
+
+            <div class="campo-duplo">
+              <label class="campo">
+                <span class="campo-rotulo">Seu nome</span>
+                <input
+                  type="text"
+                  name="nome"
+                  autocomplete="name"
+                  required
+                >
+              </label>
+
+              <label class="campo">
+                <span class="campo-rotulo">Seu WhatsApp</span>
+                <input
+                  type="tel"
+                  name="telefone"
+                  placeholder="(11) 90000-0000"
+                  autocomplete="tel"
+                  required
+                >
+              </label>
+            </div>
+
+            <label class="campo">
+              <span class="campo-rotulo">
+                Mais alguma coisa?
+                <em class="campo-opcional">opcional</em>
+              </span>
+              <textarea
+                name="recado"
+                rows="3"
+                placeholder="Local sem energia, drink autoral, horário de montagem…"
+              ></textarea>
+            </label>
+          </fieldset>
+
+          <!-- Só o passo atual mostra seus botões. -->
+          <div class="orcamento-acoes">
+            <button type="button" class="btn btn-ghost" data-voltar hidden>
+              Voltar
+            </button>
+            <button type="button" class="btn btn-solid" data-avancar>
+              Continuar
+            </button>
+            <button type="submit" class="btn btn-solid" data-enviar hidden>
+              Enviar no WhatsApp
+            </button>
+          </div>
+
+          <!-- Anunciado ao leitor de tela a cada troca de passo. -->
+          <p class="orcamento-aviso" role="status" aria-live="polite"></p>
+        </form>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer" id="contato">
+      <div class="rodape-marca">
+        <img src="/brand/playbar-logo.png" width="489" height="213" alt="Playbar" />
+        <p class="tag">#aperteoplay</p>
+      </div>
+
+      <nav class="rodape-blocos" aria-label="Rodapé">
+        <div class="rodape-bloco">
+          <h2>Contato</h2>
+          <a href="mailto:playbar.eventos@gmail.com">playbar.eventos@gmail.com</a>
+          <a href="#orcamento">Pedir orçamento</a>
+        </div>
+
+        <div class="rodape-bloco">
+          <h2>Redes</h2>
+          <a
+            href="https://www.instagram.com/playbar.eventos/"
+            target="_blank"
+            rel="noopener"
+          >Instagram</a>
+          <a
+            href="https://www.tiktok.com/@playbar.eventos"
+            target="_blank"
+            rel="noopener"
+          >TikTok</a>
+        </div>
+
+        <div class="rodape-bloco">
+          <h2>O bar</h2>
+          <a href="#servicos">O que fazemos</a>
+          <a href="#sobre">Sobre</a>
+        </div>
+      </nav>
+
+      <p class="rodape-fim">© <span data-year></span> Playbar</p>
+    </footer>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
